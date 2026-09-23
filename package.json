@@ -2,6 +2,7 @@
   "name": "Testes-AI-R",
   "type": "module",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^26.6.2",
     "@wdio/allure-reporter": "^9.32.0",
     "@wdio/cli": "^9.32.0",
@@ -10,9 +11,16 @@
     "@wdio/mocha-framework": "^9.32.0",
     "@wdio/spec-reporter": "^9.32.0",
     "dotenv": "^18.0.3",
-    "expect-webdriverio": "^6.1.0"
+    "eslint": "^10.11.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-wdio": "^9.31.3",
+    "expect-webdriverio": "^6.1.0",
+    "prettier": "^3.9.9",
+    "typescript-eslint": "^8.70.1"
   },
   "scripts": {
-    "wdio": "wdio run ./wdio.conf.ts"
+    "wdio": "wdio run ./wdio.conf.ts",
+    "lint": "eslint .",
+    "format": "prettier --write ."
   }
 }

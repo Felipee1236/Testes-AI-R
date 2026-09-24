@@ -1,4 +1,4 @@
-import { expect } from '@wdio/globals'
+import { expect, browser } from '@wdio/globals'
 import LoginPage from '../pageobjects/login.page'
 import SignupPage from '../pageobjects/signup.page'
 import AccountPage from '../pageobjects/account.page'
@@ -32,6 +32,19 @@ describe('Cadastro', () => {
 
     await AccountPage.continue()
     await expect(HomePage.loggedInAs).toHaveText(expect.stringContaining(user.name))
+  })
+
+  it('não deve enviar o cadastro com a senha em branco', async () => {
+    const user = { ...createUser(), password: '' }
+
+    await LoginPage.open()
+    await LoginPage.startSignup(user.name, user.email)
+    await SignupPage.fillAccountInfo(user)
+    await SignupPage.submit()
+
+    await expect(browser).toHaveUrl(expect.stringContaining('/signup'))
+    await expect(AccountPage.titleCreated).not.toBeExisting()
+    expect(await SignupPage.isPasswordMissing()).toBe(true)
   })
 
   it('deve exibir erro ao cadastrar com e-mail já existente', async () => {

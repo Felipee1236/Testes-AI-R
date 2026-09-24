@@ -1,4 +1,4 @@
-import { $ } from '@wdio/globals'
+import { $, browser } from '@wdio/globals'
 import BasePage from './base.page'
 import type { User } from '../utils/user.factory'
 
@@ -92,6 +92,11 @@ class SignupPage extends BasePage {
 
   public async submit() {
     await this.btnCreateAccount.click()
+  }
+
+  public async isPasswordMissing(): Promise<boolean> {
+    const input = await this.inputPassword
+    return browser.execute((el) => (el as unknown as HTMLInputElement).validity.valueMissing, input)
   }
 }
 

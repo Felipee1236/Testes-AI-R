@@ -17,7 +17,7 @@ export interface User {
 }
 
 export function createUser(): User {
-  const id = Date.now()
+  const id = `${Date.now()}${Math.floor(Math.random() * 1000)}`
 
   return {
     name: `QA ${id}`,

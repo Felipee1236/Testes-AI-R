@@ -146,6 +146,8 @@ Etapas:
 3. Executa a suíte completa no Chrome em modo headless
 4. Gera o relatório Allure e publica como artefato, **mesmo quando algum teste falha** (`if: always()`)
 
+Proteções da pipeline: limite de 20 minutos por execução (`timeout-minutes`), para que uma execução travada não consuma recursos indefinidamente, e cancelamento automático de execuções antigas da mesma branch quando um novo push chega (`concurrency`).
+
 **Onde ver o relatório:** aba **Actions** → execução desejada → seção **Artifacts** → `allure-report`. Após baixar e extrair, abra com:
 
 ```bash

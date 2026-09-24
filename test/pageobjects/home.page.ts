@@ -2,6 +2,10 @@ import { $ } from '@wdio/globals'
 import BasePage from './base.page'
 
 class HomePage extends BasePage {
+  public get linkLogin() {
+    return $('a[href="/login"]')
+  }
+
   public get linkLogout() {
     return $('a[href="/logout"]')
   }
@@ -14,15 +18,12 @@ class HomePage extends BasePage {
     return $('a*=Logged in as')
   }
 
-  public async deleteAccount() {
-    await this.linkDeleteAccount.click()
-  }
-  public get linkLogin() {
-    return $('a[href="/login"]')
-  }
-
   public async logout() {
     await this.linkLogout.click()
+  }
+
+  public async deleteAccount() {
+    await this.linkDeleteAccount.click()
   }
 }
 

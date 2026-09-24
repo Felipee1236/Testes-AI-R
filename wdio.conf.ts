@@ -1,4 +1,8 @@
 import 'dotenv/config'
+
+if (!process.env.BASE_URL) {
+  throw new Error('BASE_URL não definida. Copie o .env.example para .env antes de rodar os testes.')
+}
 export const config: WebdriverIO.Config = {
   //
   // ====================
@@ -87,7 +91,7 @@ export const config: WebdriverIO.Config = {
   // with `/`, the base url gets prepended, not including the path portion of your baseUrl.
   // If your `url` parameter starts without a scheme or `/` (like `some/path`), the base url
   // gets prepended directly.
-  // baseUrl: process.env.BASE_URL,
+ baseUrl: process.env.BASE_URL,
   //
   // Default timeout for all waitFor* commands.
   waitforTimeout: 10000,

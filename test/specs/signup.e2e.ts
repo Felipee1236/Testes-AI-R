@@ -3,12 +3,19 @@ import LoginPage from '../pageobjects/login.page'
 import SignupPage from '../pageobjects/signup.page'
 import AccountPage from '../pageobjects/account.page'
 import HomePage from '../pageobjects/home.page'
-import { createUser } from '../utils/user.factory'
+import { createUser, type User } from '../utils/user.factory'
+import { registerUser, deleteUser } from '../utils/account.helper'
 
 describe('Cadastro', () => {
+  let createdUser: User | undefined
+
+  beforeEach(() => {
+    createdUser = undefined
+  })
+
   afterEach(async () => {
-    if (await HomePage.linkDeleteAccount.isExisting()) {
-      await HomePage.deleteAccount()
+    if (createdUser) {
+      await deleteUser(createdUser)
     }
   })
 
@@ -19,10 +26,23 @@ describe('Cadastro', () => {
     await LoginPage.startSignup(user.name, user.email)
     await SignupPage.fillAccountInfo(user)
     await SignupPage.submit()
+    createdUser = user
 
     await expect(AccountPage.titleCreated).toHaveText('Account Created!', { ignoreCase: true })
 
     await AccountPage.continue()
     await expect(HomePage.loggedInAs).toHaveText(expect.stringContaining(user.name))
+  })
+
+  it('deve exibir erro ao cadastrar com e-mail já existente', async () => {
+    const user = createUser()
+    await registerUser(user)
+    createdUser = user
+    await HomePage.logout()
+
+    await LoginPage.open()
+    await LoginPage.startSignup(user.name, user.email)
+
+    await expect(LoginPage.signupErrorMessage).toHaveText('Email Address already exist!')
   })
 })

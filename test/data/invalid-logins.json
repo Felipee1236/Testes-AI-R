@@ -1,0 +1,12 @@
+[
+  {
+    "cenario": "senha incorreta",
+    "usarEmailCadastrado": true,
+    "password": "SenhaErrada@123"
+  },
+  {
+    "cenario": "e-mail não cadastrado",
+    "email": "nao.cadastrado.qa@teste.com",
+    "password": "Senha@123"
+  }
+]

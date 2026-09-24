@@ -40,6 +40,13 @@ class LoginPage extends BasePage {
     await this.inputSignupEmail.setValue(email)
     await this.btnSignup.click()
   }
+  public get loginErrorMessage() {
+    return $('form[action="/login"] p')
+  }
+
+  public get signupErrorMessage() {
+    return $('form[action="/signup"] p')
+  }
 }
 
 export default new LoginPage()

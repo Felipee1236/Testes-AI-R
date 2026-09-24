@@ -50,7 +50,7 @@ export const config: WebdriverIO.Config = {
   // and 30 processes will get spawned. The property handles how many capabilities
   // from the same test should run tests.
   //
-  maxInstances: 10,
+  maxInstances: process.env.CI ? 2 : 10,
   //
   // If you have trouble getting all important capabilities together, check out the
   // Sauce Labs platform configurator - a great tool to configure your capabilities:
@@ -62,11 +62,13 @@ export const config: WebdriverIO.Config = {
       'goog:chromeOptions': {
         args: [
           '--host-resolver-rules=MAP *.googlesyndication.com 127.0.0.1, MAP *.doubleclick.net 127.0.0.1, MAP *.googleadservices.com 127.0.0.1, MAP *.adtrafficquality.google 127.0.0.1, MAP *.fundingchoicesmessages.google.com 127.0.0.1',
+          ...(process.env.CI
+            ? ['--headless=new', '--no-sandbox', '--disable-dev-shm-usage', '--window-size=1920,1080']
+            : []),
         ],
       },
     },
   ],
-
   //
   // ===================
   // Test Configurations

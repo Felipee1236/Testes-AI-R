@@ -23,4 +23,12 @@ describe('Autenticação', () => {
 
     await expect(HomePage.loggedInAs).toHaveText(expect.stringContaining(user.name))
   })
+    it('deve encerrar a sessão ao fazer logout', async () => {
+    await LoginPage.open()
+    await LoginPage.login(user.email, user.password)
+    await HomePage.logout()
+
+    await expect(HomePage.linkLogout).not.toBeExisting()
+    await expect(HomePage.linkLogin).toBeDisplayed()
+  })
 })

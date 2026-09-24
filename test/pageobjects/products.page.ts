@@ -44,6 +44,22 @@ class ProductsPage extends BasePage {
   public async openFirstProductDetails() {
     await this.firstViewProductLink.click()
   }
+  public get firstAddToCartButton() {
+    return $('.features_items .productinfo a[data-product-id]')
+  }
+
+  public get cartModalViewCartLink() {
+    return $('#cartModal a[href="/view_cart"]')
+  }
+
+  public async addFirstProductToCart() {
+    await this.firstAddToCartButton.click()
+  }
+
+  public async viewCartFromModal() {
+    await this.cartModalViewCartLink.waitForClickable()
+    await this.cartModalViewCartLink.click()
+  }
 }
 
 export default new ProductsPage()

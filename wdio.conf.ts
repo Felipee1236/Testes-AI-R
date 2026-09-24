@@ -1,4 +1,6 @@
 import 'dotenv/config'
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import os from 'node:os'
 
 if (!process.env.BASE_URL) {
   throw new Error('BASE_URL não definida. Copie o .env.example para .env antes de rodar os testes.')
@@ -157,8 +159,9 @@ export const config: WebdriverIO.Config = {
    * @param {object} config wdio configuration object
    * @param {Array.<Object>} capabilities list of capabilities details
    */
-  // onPrepare: function (config, capabilities) {
-  // },
+  onPrepare: function () {
+    rmSync('allure-results', { recursive: true, force: true })
+  },
   /**
    * Gets executed before a worker process is spawned and can be used to initialize specific service
    * for that worker as well as modify runtime environments in an async fashion.
@@ -196,8 +199,21 @@ export const config: WebdriverIO.Config = {
    * @param {Array.<String>} specs        List of spec file paths that are to be run
    * @param {object}         browser      instance of created browser/device session
    */
-  // before: function (capabilities, specs) {
-  // },
+  before: function () {
+    const caps = browser.capabilities as WebdriverIO.Capabilities
+    mkdirSync('allure-results', { recursive: true })
+    writeFileSync(
+      'allure-results/environment.properties',
+      [
+        `Browser=${caps.browserName}`,
+        `Browser.Version=${caps.browserVersion}`,
+        `Platform=${caps.platformName}`,
+        `OS=${os.type()} ${os.release()}`,
+        `Node=${process.version}`,
+        `Base.URL=${process.env.BASE_URL}`,
+      ].join('\n'),
+    )
+  },
   /**
    * Runs before a WebdriverIO command gets executed.
    * @param {string} commandName hook command name

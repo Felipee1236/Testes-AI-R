@@ -1,9 +1,8 @@
-# Testes-AI-R
 # Automação de Testes Web: WebdriverIO
 
 Projeto de automação E2E do site [Automation Exercise](https://automationexercise.com), desenvolvido como desafio técnico. Cobre as principais jornadas de um e-commerce: autenticação, cadastro, navegação e formulários.
 
-> **Status:** em desenvolvimento. A tabela de [cenários](#cenários-de-teste) mostra o que já está implementado.
+> **Status:** 10 cenários implementados. Pipeline de CI e execução em nuvem em andamento.
 
 ## Stack
 
@@ -72,10 +71,17 @@ test/
 │   ├── home.page.ts      # cabeçalho: login, logout, usuário logado
 │   ├── login.page.ts     # login e início do cadastro
 │   ├── signup.page.ts    # formulário completo de cadastro
-│   └── account.page.ts   # telas de conta criada e excluída
+│   ├── account.page.ts   # telas de conta criada e excluída
+│   ├── products.page.ts  # listagem, filtro por categoria e carrinho
+│   ├── product-details.page.ts # detalhes de um produto
+│   ├── cart.page.ts      # carrinho e modal de checkout
+│   └── contact.page.ts   # formulário de contato
 ├── specs/                # testes, um arquivo por funcionalidade
-│   ├── auth.e2e.ts
-│   └── signup.e2e.ts
+│   ├── auth.e2e.ts       # cenários 1, 2 e 3
+│   ├── signup.e2e.ts     # cenários 4, 6 e 9
+│   ├── contact.e2e.ts    # cenário 5
+│   ├── navigation.e2e.ts # cenários 7 e 8
+│   └── cart.e2e.ts       # cenário 10
 ├── utils/
 │   ├── user.factory.ts   # gera usuários únicos por execução
 │   ├── account.helper.ts # cria e exclui contas para preparar testes
@@ -94,12 +100,12 @@ Os 10 cenários foram priorizados por risco e impacto nas jornadas principais, c
 | 2 | Logout encerra a sessão | Autenticação | Sucesso | Implementado |
 | 3 | Login com credenciais inválidas (data-driven) | Autenticação | Falha | Implementado |
 | 4 | Cadastro completo de conta | Formulários | Sucesso | Implementado |
-| 5 | Envio do formulário de contato | Formulários | Sucesso | Planejado |
-| 6 | Cadastro com campo obrigatório vazio | Formulários | Falha | Planejado |
-| 7 | Navegação por categoria de produtos | Navegação | Sucesso | Planejado |
-| 8 | Detalhes de produto a partir da listagem | Navegação | Sucesso | Planejado |
+| 5 | Envio do formulário de contato | Formulários | Sucesso | Implementado |
+| 6 | Cadastro com campo obrigatório vazio | Formulários | Falha | Implementado |
+| 7 | Navegação por categoria de produtos | Navegação | Sucesso | Implementado |
+| 8 | Detalhes de produto a partir da listagem | Navegação | Sucesso | Implementado |
 | 9 | Cadastro com e-mail já existente | Validação | Falha | Implementado |
-| 10 | Checkout sem login exige autenticação | Validação | Falha | Planejado |
+| 10 | Checkout sem login exige autenticação | Validação | Falha | Implementado |
 
 A proporção de 6 cenários de sucesso para 4 de falha segue a pirâmide de testes: o E2E garante as jornadas críticas de ponta a ponta, enquanto validações campo a campo são mais baratas em camadas inferiores, como API e testes unitários.
 
@@ -113,11 +119,13 @@ Fluxos que atravessam várias páginas e servem de preparação, como criar uma 
 
 ### Estratégia de seletores
 
-Prioridade: `id` e `data-qa` (equivalente ao `data-testid`), depois atributos funcionais como `href` e `action` (as mensagens de erro são localizadas por `form[action="/login"] p`). XPath não é usado. Selects são preenchidos por valor ou texto visível, nunca pela posição da opção. A única exceção é o texto "Logged in as", que não possui id nem `data-qa` e é justamente o conteúdo validado.
+Prioridade: `id` e `data-qa` (equivalente ao `data-testid`), depois atributos funcionais como `href` e `action` (as mensagens de erro são localizadas por `form[action="/login"] p`). XPath não é usado. Selects são preenchidos por valor ou texto visível, nunca pela posição da opção.
+
+Exceções justificadas: o título e os cards da listagem de produtos usam classe CSS, por não terem id nem `data-qa`; a subcategoria é localizada pelo texto dentro do painel da categoria (`#Women`), porque seu `href` é um número sem significado. A única exceção é o texto "Logged in as", que não possui id nem `data-qa` e é justamente o conteúdo validado.
 
 ### Esperas explícitas
 
-Nenhuma pausa fixa. As asserções do WebdriverIO (`toBeDisplayed`, `toHaveText`) aguardam o elemento automaticamente até o timeout configurado. O plugin `eslint-plugin-wdio` acusa erro se `browser.pause()` for usado.
+Nenhuma pausa fixa. As asserções do WebdriverIO (`toBeDisplayed`, `toHaveText`) aguardam o elemento automaticamente até o timeout configurado. Elementos que aparecem após animação, como as subcategorias do menu de produtos, usam `waitForClickable` antes do clique. O plugin `eslint-plugin-wdio` acusa erro se `browser.pause()` for usado.
 
 ### Massa de dados independente
 
@@ -134,6 +142,14 @@ A preparação é feita pela interface, mantendo o projeto 100% E2E. O custo ace
 
 O login inválido lê seus casos de `test/data/invalid-logins.json`, e cada linha vira um teste no relatório. Para cobrir um caso novo, basta adicionar uma linha ao arquivo, sem alterar código. Casos atuais: senha incorreta para um e-mail cadastrado e e-mail não cadastrado.
 
+### Execução em paralelo
+
+Cada arquivo de spec roda em um navegador próprio, ao mesmo tempo (`maxInstances`). Isso só é possível porque os testes são independentes: cada um cria e exclui a própria massa de dados, com e-mail único gerado por timestamp mais um sufixo aleatório, evitando colisões entre execuções simultâneas.
+
+### Validação nativa do navegador
+
+No cenário 6, o campo de senha é `required`, e o próprio navegador bloqueia o envio sem exibir mensagem na página. O teste verifica `validity.valueMissing` do campo, que não depende do idioma do navegador, além de confirmar que a página não mudou e que a conta não foi criada.
+
 ### Variáveis de ambiente
 
 A URL do site vem do `.env`. Não há valor padrão no código, de propósito: se a variável faltar, a execução falha imediatamente com uma mensagem clara, em vez de rodar em silêncio contra um ambiente diferente.
@@ -146,7 +162,6 @@ O site exibe anúncios de terceiros que abrem em tela cheia ou cobrem botões, c
 
 ## Próximos passos
 
-- [ ] Completar os 10 cenários
 - [ ] Captura de screenshot em falhas, anexada ao Allure
 - [ ] Pipeline no GitHub Actions com relatório como artefato
 - [ ] Execução em nuvem no LambdaTest

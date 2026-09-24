@@ -17,6 +17,13 @@ class HomePage extends BasePage {
   public async deleteAccount() {
     await this.linkDeleteAccount.click()
   }
+  public get linkLogin() {
+    return $('a[href="/login"]')
+  }
+
+  public async logout() {
+    await this.linkLogout.click()
+  }
 }
 
 export default new HomePage()

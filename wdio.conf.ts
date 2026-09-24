@@ -54,9 +54,14 @@ export const config: WebdriverIO.Config = {
   // Sauce Labs platform configurator - a great tool to configure your capabilities:
   // https://saucelabs.com/platform/platform-configurator
   //
-  capabilities: [
+    capabilities: [
     {
       browserName: 'chrome',
+      'goog:chromeOptions': {
+        args: [
+          '--host-resolver-rules=MAP *.googlesyndication.com 127.0.0.1, MAP *.doubleclick.net 127.0.0.1, MAP *.googleadservices.com 127.0.0.1, MAP *.adtrafficquality.google 127.0.0.1, MAP *.fundingchoicesmessages.google.com 127.0.0.1',
+        ],
+      },
     },
   ],
 

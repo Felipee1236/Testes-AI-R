@@ -29,6 +29,21 @@ class ProductsPage extends BasePage {
     await link.waitForClickable()
     await link.click()
   }
+  public get firstProductName() {
+    return $('.features_items .productinfo p')
+  }
+
+  public get firstProductPrice() {
+    return $('.features_items .productinfo h2')
+  }
+
+  public get firstViewProductLink() {
+    return $('.features_items a[href^="/product_details/"]')
+  }
+
+  public async openFirstProductDetails() {
+    await this.firstViewProductLink.click()
+  }
 }
 
 export default new ProductsPage()

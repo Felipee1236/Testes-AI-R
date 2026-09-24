@@ -54,7 +54,7 @@ export const config: WebdriverIO.Config = {
   // Sauce Labs platform configurator - a great tool to configure your capabilities:
   // https://saucelabs.com/platform/platform-configurator
   //
-    capabilities: [
+  capabilities: [
     {
       browserName: 'chrome',
       'goog:chromeOptions': {

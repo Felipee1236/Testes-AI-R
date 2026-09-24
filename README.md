@@ -1,8 +1,10 @@
 # Automação de Testes Web: WebdriverIO
 
+[![Testes E2E](https://github.com/Felipee1236/Testes-AI-R/actions/workflows/e2e.yml/badge.svg)](https://github.com/Felipee1236/Testes-AI-R/actions/workflows/e2e.yml)
+
 Projeto de automação E2E do site [Automation Exercise](https://automationexercise.com), desenvolvido como desafio técnico. Cobre as principais jornadas de um e-commerce: autenticação, cadastro, navegação e formulários.
 
-> **Status:** 10 cenários implementados. Pipeline de CI e execução em nuvem em andamento.
+> **Status:** 10 cenários implementados, com relatório Allure e pipeline no GitHub Actions. Execução em nuvem em andamento.
 
 ## Stack
 
@@ -12,6 +14,7 @@ Projeto de automação E2E do site [Automation Exercise](https://automationexerc
 | TypeScript | Linguagem |
 | Mocha | Test runner |
 | Allure Report | Relatório interativo |
+| GitHub Actions | Integração contínua |
 | ESLint + Prettier | Qualidade e padronização do código |
 | dotenv | Variáveis de ambiente |
 
@@ -46,13 +49,19 @@ O `.env.example` já vem com a URL do site preenchida. Se o `.env` não existir,
 Todos os testes:
 
 ```bash
-npx wdio run ./wdio.conf.ts
+npm test
 ```
 
 Um arquivo específico:
 
 ```bash
 npx wdio run ./wdio.conf.ts --spec ./test/specs/auth.e2e.ts
+```
+
+Gerar e abrir o relatório Allure (após rodar os testes):
+
+```bash
+npm run report
 ```
 
 Qualidade de código:
@@ -82,6 +91,8 @@ test/
 │   ├── contact.e2e.ts    # cenário 5
 │   ├── navigation.e2e.ts # cenários 7 e 8
 │   └── cart.e2e.ts       # cenário 10
+.github/workflows/
+└── e2e.yml               # pipeline de CI
 ├── utils/
 │   ├── user.factory.ts   # gera usuários únicos por execução
 │   ├── account.helper.ts # cria e exclui contas para preparar testes
@@ -107,7 +118,46 @@ Os 10 cenários foram priorizados por risco e impacto nas jornadas principais, c
 | 9 | Cadastro com e-mail já existente | Validação | Falha | Implementado |
 | 10 | Checkout sem login exige autenticação | Validação | Falha | Implementado |
 
+Os 10 cenários geram 11 testes no relatório: o cenário 3 é data-driven e roda uma vez para cada caso do arquivo JSON (hoje, 2 casos).
+
 A proporção de 6 cenários de sucesso para 4 de falha segue a pirâmide de testes: o E2E garante as jornadas críticas de ponta a ponta, enquanto validações campo a campo são mais baratas em camadas inferiores, como API e testes unitários.
+
+## Relatório e evidências
+
+O relatório Allure reúne:
+
+| Requisito | Como é atendido |
+| --- | --- |
+| Status de execução | Pass, fail e skipped por teste e por suíte |
+| Logs de execução | Cada comando do WebdriverIO aparece como um passo do teste |
+| Screenshot na falha | O hook `afterTest` captura a tela quando um teste falha, e o Allure anexa a imagem ao teste |
+| Metadados do ambiente | O hook `before` grava `environment.properties` com navegador, versão, plataforma, sistema operacional, Node e URL base, lidos da sessão real |
+
+Os resultados anteriores são apagados no início de cada execução (hook `onPrepare`), para que o relatório nunca misture execuções diferentes.
+
+## Integração contínua
+
+A pipeline fica em `.github/workflows/e2e.yml` e roda automaticamente a cada `push` ou `pull_request` na branch `main`. Também pode ser disparada manualmente pela aba **Actions** (`workflow_dispatch`).
+
+Etapas:
+
+1. Instala Node.js 20, Java 17 (para o Allure) e as dependências com `npm ci`
+2. Roda o ESLint: código fora do padrão barra a pipeline antes dos testes
+3. Executa a suíte completa no Chrome em modo headless
+4. Gera o relatório Allure e publica como artefato, **mesmo quando algum teste falha** (`if: always()`)
+
+**Onde ver o relatório:** aba **Actions** → execução desejada → seção **Artifacts** → `allure-report`. Após baixar e extrair, abra com:
+
+```bash
+npx allure open allure-report
+```
+
+Diferenças da execução local, ativadas pela variável `CI` que o GitHub define automaticamente:
+
+- Chrome em modo headless, com janela de 1920x1080 para manter o layout de desktop
+- No máximo 2 navegadores em paralelo, para não sobrecarregar o servidor da pipeline
+
+A `BASE_URL` é definida no próprio workflow, já que não é um dado sensível. Credenciais, como as do LambdaTest, ficam em **GitHub Secrets**.
 
 ## Decisões técnicas
 
@@ -121,7 +171,7 @@ Fluxos que atravessam várias páginas e servem de preparação, como criar uma 
 
 Prioridade: `id` e `data-qa` (equivalente ao `data-testid`), depois atributos funcionais como `href` e `action` (as mensagens de erro são localizadas por `form[action="/login"] p`). XPath não é usado. Selects são preenchidos por valor ou texto visível, nunca pela posição da opção.
 
-Exceções justificadas: o título e os cards da listagem de produtos usam classe CSS, por não terem id nem `data-qa`; a subcategoria é localizada pelo texto dentro do painel da categoria (`#Women`), porque seu `href` é um número sem significado. A única exceção é o texto "Logged in as", que não possui id nem `data-qa` e é justamente o conteúdo validado.
+Exceções justificadas: o título e os cards da listagem de produtos usam classe CSS, por não terem id nem `data-qa`; a subcategoria é localizada pelo texto dentro do painel da categoria (`#Women`), porque seu `href` é um número sem significado; e o link "Logged in as" é localizado pelo texto, que é justamente o conteúdo validado.
 
 ### Esperas explícitas
 
@@ -162,8 +212,6 @@ O site exibe anúncios de terceiros que abrem em tela cheia ou cobrem botões, c
 
 ## Próximos passos
 
-- [ ] Captura de screenshot em falhas, anexada ao Allure
-- [ ] Pipeline no GitHub Actions com relatório como artefato
 - [ ] Execução em nuvem no LambdaTest
 
 ### Melhorias fora do escopo atual

@@ -10,20 +10,24 @@ class ProductsPage extends BasePage {
     return $$('.features_items .product-image-wrapper')
   }
 
+  public get firstProductCard() {
+    return $('.features_items .product-image-wrapper')
+  }
+
   public get firstProductName() {
-    return $('.features_items .productinfo p')
+    return this.firstProductCard.$('.productinfo p')
   }
 
   public get firstProductPrice() {
-    return $('.features_items .productinfo h2')
+    return this.firstProductCard.$('.productinfo h2')
   }
 
   public get firstViewProductLink() {
-    return $('.features_items a[href^="/product_details/"]')
+    return this.firstProductCard.$('a[href^="/product_details/"]')
   }
 
   public get firstAddToCartButton() {
-    return $('.features_items .productinfo a[data-product-id]')
+    return this.firstProductCard.$('.productinfo a[data-product-id]')
   }
 
   public get cartModalViewCartLink() {

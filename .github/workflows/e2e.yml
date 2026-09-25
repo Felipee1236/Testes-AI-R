@@ -40,6 +40,12 @@ jobs:
       - name: Verificar qualidade do código
         run: npm run lint
 
+      - name: Verificar formatação
+        run: npm run format:check
+
+      - name: Verificar tipos
+        run: npm run typecheck
+
       - name: Executar testes
         run: npm test
 

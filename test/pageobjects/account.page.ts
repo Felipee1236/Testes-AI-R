@@ -6,10 +6,6 @@ class AccountPage extends BasePage {
     return $('[data-qa="account-created"]')
   }
 
-  public get titleDeleted() {
-    return $('[data-qa="account-deleted"]')
-  }
-
   public get btnContinue() {
     return $('[data-qa="continue-button"]')
   }

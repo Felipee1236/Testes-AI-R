@@ -4,7 +4,7 @@ import SignupPage from '../pageobjects/signup.page'
 import AccountPage from '../pageobjects/account.page'
 import HomePage from '../pageobjects/home.page'
 import { createUser, type User } from '../utils/user.factory'
-import { registerUser, deleteUser } from '../utils/account.helper'
+import { createAccount, deleteAccount } from '../utils/account.api'
 
 describe('Cadastro', () => {
   let createdUser: User | undefined
@@ -15,7 +15,7 @@ describe('Cadastro', () => {
 
   afterEach(async () => {
     if (createdUser) {
-      await deleteUser(createdUser)
+      await deleteAccount(createdUser)
     }
   })
 
@@ -49,9 +49,8 @@ describe('Cadastro', () => {
 
   it('deve exibir erro ao cadastrar com e-mail já existente', async () => {
     const user = createUser()
-    await registerUser(user)
+    await createAccount(user)
     createdUser = user
-    await HomePage.logout()
 
     await LoginPage.open()
     await LoginPage.startSignup(user.name, user.email)

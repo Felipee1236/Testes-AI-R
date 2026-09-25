@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "module": "ESNext",
     "target": "es2022",
     "lib": ["es2022", "dom"],
@@ -15,5 +15,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["test/specs", "wdio.conf.ts"]
+  "include": ["test", "wdio.conf.ts", "wdio.lambdatest.conf.ts"]
 }

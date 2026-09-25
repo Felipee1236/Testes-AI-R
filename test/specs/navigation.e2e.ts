@@ -22,4 +22,4 @@ describe('Navegação', () => {
     await expect(ProductDetailsPage.productName).toHaveText(name)
     await expect(ProductDetailsPage.productPrice).toHaveText(price)
   })
-}) 
+})

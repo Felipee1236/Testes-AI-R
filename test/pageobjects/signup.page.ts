@@ -67,18 +67,26 @@ class SignupPage extends BasePage {
     return $('[data-qa="mobile_number"]')
   }
 
+  public get selectedMonth() {
+    return this.selectMonth.$('option:checked')
+  }
+
+  public get selectedCountry() {
+    return this.selectCountry.$('option:checked')
+  }
+
   public get btnCreateAccount() {
     return $('[data-qa="create-account"]')
   }
 
   public async fillAccountInfo(user: User) {
-    await this.radioMr.click()
+    await this.check(this.radioMr)
     await this.inputPassword.setValue(user.password, { mask: true })
     await this.selectDay.selectByAttribute('value', user.birthDay)
     await this.selectMonth.selectByVisibleText(user.birthMonth)
     await this.selectYear.selectByAttribute('value', user.birthYear)
-    await this.checkboxNewsletter.click()
-    await this.checkboxOffers.click()
+    await this.check(this.checkboxNewsletter)
+    await this.check(this.checkboxOffers)
     await this.inputFirstName.setValue(user.firstName)
     await this.inputLastName.setValue(user.lastName)
     await this.inputCompany.setValue(user.company)

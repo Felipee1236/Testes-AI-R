@@ -189,12 +189,12 @@ Funcionalidade: Carrinho
 
 O relatório Allure reúne:
 
-| Requisito             | Como é atendido                                                                                                                                  |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Status de execução    | Pass, fail e skipped por teste e por suíte                                                                                                       |
-| Logs de execução      | Cada comando do WebdriverIO aparece como um passo do teste                                                                                       |
-| Screenshot na falha   | Os hooks `afterTest` e `afterHook` capturam a tela quando um teste ou sua preparação (`beforeEach`/`afterEach`) falha, e o Allure anexa a imagem |
-| Metadados do ambiente | O hook `before` grava `environment.properties` com navegador, versão, plataforma, sistema operacional, Node e URL base, lidos da sessão real     |
+| Requisito             | Como é atendido                                                                                                                                                                                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Status de execução    | Pass, fail e skipped por teste e por suíte                                                                                                                                                             |
+| Logs de execução      | Cada comando do WebdriverIO aparece como um passo do teste                                                                                                                                             |
+| Screenshot na falha   | Os hooks `afterTest` e `afterHook` capturam a tela quando um teste ou sua preparação (`beforeEach`/`afterEach`) falha, e o Allure anexa a imagem                                                       |
+| Metadados do ambiente | O hook `before` grava `environment.properties` com navegador, versão, sistema operacional do navegador (na nuvem, o da máquina remota), sistema operacional de quem dispara os testes, Node e URL base |
 
 Os resultados anteriores são apagados no início de cada execução (hook `onPrepare`), para que o relatório nunca misture execuções diferentes.
 
@@ -235,7 +235,7 @@ A preparação da massa de dados não passa pelos page objects: `utils/account.a
 
 ### Estratégia de seletores
 
-Prioridade: `id` e `data-qa` (equivalente ao `data-testid`), depois atributos funcionais como `href` e `action` (as mensagens de erro são localizadas por `form[action="/login"] p`). XPath não é usado. Selects são preenchidos por valor ou texto visível, nunca pela posição da opção.
+Prioridade: `id` e `data-qa` (equivalente ao `data-testid`), depois atributos funcionais como `href` e `action` (as mensagens de erro são localizadas por `form[action="/login"] p`). XPath não é usado. Selects são preenchidos por valor ou texto visível, nunca pela posição da opção. Radio e checkboxes são marcados só se ainda estiverem desmarcados (`check`, em `base.page.ts`), porque um clique simples desmarcaria uma opção já marcada, e o cenário 4 confere o estado de cada um antes de enviar o formulário.
 
 Exceções justificadas: o título e os cards da listagem de produtos usam classe CSS, por não terem id nem `data-qa`; a subcategoria é localizada pelo texto dentro do painel da categoria (`#Women`), porque seu `href` é um número sem significado; e o link "Logged in as" é localizado pelo texto, que é justamente o conteúdo validado.
 
@@ -258,7 +258,7 @@ A exclusão nunca derruba a suíte. No Mocha, uma falha no `afterEach` interromp
 
 ### Testes data-driven
 
-O login inválido lê seus casos de `test/data/invalid-logins.json`, e cada linha vira um teste no relatório. Para cobrir um caso novo, basta adicionar uma linha ao arquivo, sem alterar código. Casos atuais: senha incorreta para um e-mail cadastrado e e-mail não cadastrado.
+O login inválido lê seus casos de `test/data/invalid-logins.json`, e cada linha vira um teste no relatório. Cada caso traz a própria mensagem esperada (`mensagemEsperada`), então casos com resultados diferentes também entram só com uma linha nova no arquivo, sem alterar código. Casos atuais: senha incorreta para um e-mail cadastrado e e-mail não cadastrado.
 
 ### Execução em paralelo
 
@@ -283,7 +283,7 @@ O WebdriverIO registra o texto de cada campo preenchido, tanto no log quanto nos
 O site exibe anúncios que abrem em tela cheia ou cobrem botões, causando falhas aleatórias. O objetivo dos testes é validar o sistema, não conteúdo externo que ele não controla, então há duas camadas de proteção:
 
 1. **Bloqueio no navegador:** o Chrome é iniciado com os domínios de anúncio bloqueados (`--host-resolver-rules`). Funciona localmente e na pipeline.
-2. **Tratamento na navegação:** na nuvem, o tráfego passa por um proxy e o bloqueio acima é ignorado. Por isso, os cliques em links usam `clickLink` (em `base.page.ts`), que espera a URL mudar e, se o anúncio intersticial interceptou a navegação (`#google_vignette`), abre o destino do link diretamente.
+2. **Tratamento na navegação:** na nuvem, o tráfego passa por um proxy e o bloqueio acima é ignorado. Por isso, os cliques em links usam `clickLink` (em `base.page.ts`), que espera a URL mudar e, se o anúncio intersticial interceptou a navegação (`#google_vignette`), abre o destino do link diretamente. Quando isso acontece, o teste registra um passo no relatório Allure e um aviso no log, para que fique claro que aquela navegação não foi feita pelo clique.
 
 Com os anúncios visíveis na nuvem, alguns elementos podem ser empurrados para fora da tela. Links que dependem de animação são esperados com `waitForDisplayed` e trazidos para a área visível com `scrollIntoView` antes do clique.
 
@@ -295,7 +295,7 @@ O título da categoria é validado com expressão regular (`/women\s*-\s*dress p
 
 `wdio.lambdatest.conf.ts` herda toda a configuração local (`...baseConfig`) e sobrescreve apenas o que muda na nuvem: endereço do grid, credenciais, sistema operacional, resolução, uma sessão por vez (limite do plano gratuito) e uma reexecução por teste.
 
-A reexecução (`retries: 1`) existe só na nuvem, onde anúncios de terceiros que não podem ser bloqueados tornam alguns testes instáveis. Os page objects continuam fiéis à jornada do usuário, sem contornos, e a instabilidade fica visível no relatório (aba **Retries** do Allure). Localmente e na pipeline não há reexecução: se um teste falha, é falha. O serviço `wdio-lambdatest-service` marca cada teste como aprovado ou reprovado no painel. As credenciais vêm do `.env`, com a mesma validação de falha rápida usada para a URL.
+A reexecução (`retries: 1`) existe só na nuvem, onde anúncios de terceiros que não podem ser bloqueados tornam alguns testes instáveis. A instabilidade fica visível no relatório (aba **Retries** do Allure), assim como cada uso do contorno de anúncio descrito acima. Localmente e na pipeline não há reexecução: se um teste falha, é falha. O serviço `wdio-lambdatest-service` marca cada teste como aprovado ou reprovado no painel. As credenciais vêm do `.env`, com a mesma validação de falha rápida usada para a URL.
 
 ## Melhorias futuras
 

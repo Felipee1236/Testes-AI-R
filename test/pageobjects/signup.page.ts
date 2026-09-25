@@ -73,7 +73,7 @@ class SignupPage extends BasePage {
 
   public async fillAccountInfo(user: User) {
     await this.radioMr.click()
-    await this.inputPassword.setValue(user.password)
+    await this.inputPassword.setValue(user.password, { mask: true })
     await this.selectDay.selectByAttribute('value', user.birthDay)
     await this.selectMonth.selectByVisibleText(user.birthMonth)
     await this.selectYear.selectByAttribute('value', user.birthYear)

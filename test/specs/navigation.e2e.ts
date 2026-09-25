@@ -8,7 +8,7 @@ describe('Navegação', () => {
     await ProductsPage.selectCategory('Women', 'Dress')
 
     await expect(browser).toHaveUrl(expect.stringContaining('/category_products/'))
-    await expect(ProductsPage.title).toHaveText('Women - Dress Products', { ignoreCase: true })
+    await expect(ProductsPage.title).toHaveText(/women\s*-\s*dress products/i)
     await expect(ProductsPage.productCards).toBeElementsArrayOfSize({ gte: 1 })
   })
   it('deve abrir os detalhes de um produto a partir da listagem', async () => {

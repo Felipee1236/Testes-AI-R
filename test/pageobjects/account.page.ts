@@ -15,7 +15,7 @@ class AccountPage extends BasePage {
   }
 
   public async continue() {
-    await this.btnContinue.click()
+    await this.clickLink(this.btnContinue)
   }
 }
 

@@ -19,11 +19,11 @@ class HomePage extends BasePage {
   }
 
   public async logout() {
-    await this.linkLogout.click()
+    await this.clickLink(this.linkLogout)
   }
 
   public async deleteAccount() {
-    await this.linkDeleteAccount.click()
+    await this.clickLink(this.linkDeleteAccount)
   }
 }
 

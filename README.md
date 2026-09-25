@@ -4,7 +4,7 @@
 
 Projeto de automação E2E do site [Automation Exercise](https://automationexercise.com), desenvolvido como desafio técnico. Cobre as principais jornadas de um e-commerce: autenticação, cadastro, navegação e formulários.
 
-> **Status:** 10 cenários implementados, com relatório Allure e pipeline no GitHub Actions. Execução em nuvem em andamento.
+> **Status:** 10 cenários implementados, executados localmente, na pipeline do GitHub Actions e na nuvem (LambdaTest), com relatório Allure.
 
 ## Stack
 
@@ -15,6 +15,7 @@ Projeto de automação E2E do site [Automation Exercise](https://automationexerc
 | Mocha | Test runner |
 | Allure Report | Relatório interativo |
 | GitHub Actions | Integração contínua |
+| LambdaTest (atual TestMu AI) | Execução em nuvem |
 | ESLint + Prettier | Qualidade e padronização do código |
 | dotenv | Variáveis de ambiente |
 
@@ -44,6 +45,13 @@ cp .env.example .env
 
 O `.env.example` já vem com a URL do site preenchida. Se o `.env` não existir, a execução para com uma mensagem indicando o que fazer.
 
+Para executar na nuvem, preencha também as credenciais do LambdaTest no `.env` (disponíveis em **Account Settings → Password & Security** no painel):
+
+```
+LT_USERNAME=seu-usuario
+LT_ACCESS_KEY=sua-chave
+```
+
 ## Execução
 
 Todos os testes:
@@ -57,6 +65,14 @@ Um arquivo específico:
 ```bash
 npx wdio run ./wdio.conf.ts --spec ./test/specs/auth.e2e.ts
 ```
+
+Na nuvem (LambdaTest), em Chrome no Windows 11:
+
+```bash
+npm run test:lambdatest
+```
+
+A execução pode ser acompanhada em **Automation → Web Automation** no painel do LambdaTest, com vídeo e log de cada teste.
 
 Gerar e abrir o relatório Allure (após rodar os testes):
 
@@ -93,6 +109,8 @@ test/
 │   └── cart.e2e.ts       # cenário 10
 .github/workflows/
 └── e2e.yml               # pipeline de CI
+wdio.conf.ts              # configuração local e da pipeline
+wdio.lambdatest.conf.ts   # configuração da nuvem (herda a local)
 ├── utils/
 │   ├── user.factory.ts   # gera usuários únicos por execução
 │   ├── account.helper.ts # cria e exclui contas para preparar testes
@@ -121,6 +139,49 @@ Os 10 cenários foram priorizados por risco e impacto nas jornadas principais, c
 Os 10 cenários geram 11 testes no relatório: o cenário 3 é data-driven e roda uma vez para cada caso do arquivo JSON (hoje, 2 casos).
 
 A proporção de 6 cenários de sucesso para 4 de falha segue a pirâmide de testes: o E2E garante as jornadas críticas de ponta a ponta, enquanto validações campo a campo são mais baratas em camadas inferiores, como API e testes unitários.
+
+### Cenários em linguagem de negócio
+
+Os testes são implementados em Mocha, conforme a stack recomendada. Para comunicação com áreas de negócio, os principais cenários também estão descritos em Gherkin:
+
+```gherkin
+Funcionalidade: Autenticação
+
+  Cenário: Login com credenciais válidas
+    Dado que existe uma conta cadastrada
+    Quando faço login com o e-mail e a senha dessa conta
+    Então vejo "Logged in as" seguido do meu nome no cabeçalho
+
+  Esquema do Cenário: Login com credenciais inválidas
+    Quando faço login com <situação>
+    Então vejo a mensagem "Your email or password is incorrect!"
+    E continuo deslogado
+
+    Exemplos:
+      | situação               |
+      | senha incorreta        |
+      | e-mail não cadastrado  |
+
+Funcionalidade: Cadastro
+
+  Cenário: Cadastro com e-mail já existente
+    Dado que existe uma conta cadastrada com um e-mail
+    Quando tento iniciar um novo cadastro com o mesmo e-mail
+    Então vejo a mensagem "Email Address already exist!"
+
+  Cenário: Cadastro com senha em branco
+    Quando preencho o cadastro completo, exceto a senha
+    E envio o formulário
+    Então continuo na página de cadastro
+    E a conta não é criada
+
+Funcionalidade: Carrinho
+
+  Cenário: Checkout sem login
+    Dado que adicionei um produto ao carrinho sem estar logado
+    Quando prossigo para o checkout
+    Então sou avisado de que preciso entrar ou me cadastrar
+```
 
 ## Relatório e evidências
 
@@ -208,18 +269,30 @@ A URL do site vem do `.env`. Não há valor padrão no código, de propósito: s
 
 O `.env` nunca é versionado. O `.env.example` serve de modelo.
 
-### Bloqueio de anúncios
+### Anúncios de terceiros
 
-O site exibe anúncios de terceiros que abrem em tela cheia ou cobrem botões, causando falhas aleatórias. O Chrome é iniciado com os domínios de anúncio bloqueados (`--host-resolver-rules`), já que o objetivo dos testes é validar o sistema, não conteúdo externo que ele não controla.
+O site exibe anúncios que abrem em tela cheia ou cobrem botões, causando falhas aleatórias. O objetivo dos testes é validar o sistema, não conteúdo externo que ele não controla, então há duas camadas de proteção:
 
-## Próximos passos
+1. **Bloqueio no navegador:** o Chrome é iniciado com os domínios de anúncio bloqueados (`--host-resolver-rules`). Funciona localmente e na pipeline.
+2. **Tratamento na navegação:** na nuvem, o tráfego passa por um proxy e o bloqueio acima é ignorado. Por isso, os cliques em links usam `clickLink` (em `base.page.ts`), que espera a URL mudar e, se o anúncio intersticial interceptou a navegação (`#google_vignette`), abre o destino do link diretamente.
 
-- [ ] Execução em nuvem no LambdaTest
+Com os anúncios visíveis na nuvem, alguns elementos podem ser empurrados para fora da tela. Links que dependem de animação são esperados com `waitForDisplayed` e trazidos para a área visível com `scrollIntoView` antes do clique.
 
-### Melhorias fora do escopo atual
+### Verificações independentes de renderização
+
+O título da categoria é validado com expressão regular (`/women\s*-\s*dress products/i`), que ignora maiúsculas e espaços extras. Versões diferentes do Chrome renderizaram o mesmo título com espaçamento diferente, e a verificação não deve depender disso.
+
+### Execução em nuvem
+
+`wdio.lambdatest.conf.ts` herda toda a configuração local (`...baseConfig`) e sobrescreve apenas o que muda na nuvem: endereço do grid, credenciais, sistema operacional, resolução, uma sessão por vez (limite do plano gratuito) e uma reexecução por teste.
+
+A reexecução (`retries: 1`) existe só na nuvem, onde anúncios de terceiros que não podem ser bloqueados tornam alguns testes instáveis. Os page objects continuam fiéis à jornada do usuário, sem contornos, e a instabilidade fica visível no relatório (aba **Retries** do Allure). Localmente e na pipeline não há reexecução: se um teste falha, é falha. O serviço `wdio-lambdatest-service` marca cada teste como aprovado ou reprovado no painel. As credenciais vêm do `.env`, com a mesma validação de falha rápida usada para a URL.
+
+## Melhorias futuras
 
 - Preparar e limpar a massa de dados via API do site, tornando os testes mais rápidos e isolando a preparação da interface
 - Separar os testes de autenticação em blocos com e sem conta, para que casos como "e-mail não cadastrado" não criem uma conta que não usam
+- Executar na nuvem também pela pipeline, com as credenciais em GitHub Secrets, em uma matriz de navegadores
 - Cenários candidatos: exclusão de conta, busca de produtos e fluxo completo de compra
 
 ## Autor

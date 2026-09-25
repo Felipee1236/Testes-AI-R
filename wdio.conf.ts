@@ -69,14 +69,16 @@ export const config: WebdriverIO.Config = {
 
   before: function () {
     const caps = browser.capabilities as WebdriverIO.Capabilities
+    const cloudOs = (browser.requestedCapabilities as WebdriverIO.Capabilities)['LT:Options']
+      ?.platformName
     mkdirSync('allure-results', { recursive: true })
     writeFileSync(
       'allure-results/environment.properties',
       [
         `Browser=${caps.browserName}`,
         `Browser.Version=${caps.browserVersion}`,
-        `Platform=${caps.platformName}`,
-        `OS=${os.type()} ${os.release()}`,
+        `Browser.OS=${cloudOs ?? caps.platformName}`,
+        `Runner.OS=${os.type()} ${os.release()}`,
         `Node=${process.version}`,
         `Base.URL=${process.env.BASE_URL}`,
       ].join('\n'),

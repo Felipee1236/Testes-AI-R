@@ -7,7 +7,12 @@ describe('Contato', () => {
     const user = createUser()
 
     await ContactPage.open()
-    await ContactPage.fillForm(user.name, user.email, 'Dúvida sobre pedido', 'Mensagem de teste automatizado.')
+    await ContactPage.fillForm(
+      user.name,
+      user.email,
+      'Dúvida sobre pedido',
+      'Mensagem de teste automatizado.',
+    )
     await ContactPage.submitAcceptingConfirmation()
 
     await expect(ContactPage.successMessage).toHaveText(

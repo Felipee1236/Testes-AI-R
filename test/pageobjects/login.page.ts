@@ -20,7 +20,7 @@ class LoginPage extends BasePage {
 
   public async login(email: string, password: string) {
     await this.inputEmail.setValue(email)
-    await this.inputPassword.setValue(password)
+    await this.inputPassword.setValue(password, { mask: true })
     await this.btnLogin.click()
   }
   public get inputSignupName() {

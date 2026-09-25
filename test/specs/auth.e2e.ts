@@ -2,7 +2,7 @@ import { expect } from '@wdio/globals'
 import LoginPage from '../pageobjects/login.page'
 import HomePage from '../pageobjects/home.page'
 import { createUser, type User } from '../utils/user.factory'
-import { registerUser, deleteUser } from '../utils/account.helper'
+import { createAccount, deleteAccount } from '../utils/account.api'
 import { loadTestData } from '../utils/data.loader'
 
 interface InvalidLogin {
@@ -19,12 +19,11 @@ describe('Autenticação', () => {
 
   beforeEach(async () => {
     user = createUser()
-    await registerUser(user)
-    await HomePage.logout()
+    await createAccount(user)
   })
 
   afterEach(async () => {
-    await deleteUser(user)
+    await deleteAccount(user)
   })
 
   it('deve fazer login com credenciais válidas', async () => {

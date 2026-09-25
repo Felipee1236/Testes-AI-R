@@ -10,20 +10,12 @@ class HomePage extends BasePage {
     return $('a[href="/logout"]')
   }
 
-  public get linkDeleteAccount() {
-    return $('a[href="/delete_account"]')
-  }
-
   public get loggedInAs() {
     return $('a*=Logged in as')
   }
 
   public async logout() {
     await this.clickLink(this.linkLogout)
-  }
-
-  public async deleteAccount() {
-    await this.clickLink(this.linkDeleteAccount)
   }
 }
 

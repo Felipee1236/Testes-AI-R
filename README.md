@@ -21,7 +21,7 @@ Projeto de automação E2E do site [Automation Exercise](https://automationexerc
 
 ## Pré-requisitos
 
-- [Node.js](https://nodejs.org) 18 ou superior
+- [Node.js](https://nodejs.org) 20.19 ou superior (exigido pelo ESLint 10)
 - Google Chrome atualizado (o driver é baixado automaticamente)
 - Java 8 ou superior, para gerar o relatório Allure
 

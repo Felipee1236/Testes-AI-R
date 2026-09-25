@@ -41,6 +41,10 @@ describe('Autenticação', () => {
 
     await expect(HomePage.linkLogout).not.toBeExisting()
     await expect(HomePage.linkLogin).toBeDisplayed()
+
+    await HomePage.open('/')
+    await expect(HomePage.loggedInAs).not.toBeExisting()
+    await expect(HomePage.linkLogin).toBeDisplayed()
   })
 
   for (const caso of invalidLogins) {

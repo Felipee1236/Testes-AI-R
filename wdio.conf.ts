@@ -10,6 +10,16 @@ export const adBlockArgs = [
   '--host-resolver-rules=MAP *.googlesyndication.com 127.0.0.1, MAP *.doubleclick.net 127.0.0.1, MAP *.googleadservices.com 127.0.0.1, MAP *.adtrafficquality.google 127.0.0.1, MAP *.fundingchoicesmessages.google.com 127.0.0.1',
 ]
 
+async function screenshotOnFailure(
+  _test: unknown,
+  _context: unknown,
+  { error }: { error?: unknown },
+) {
+  if (error) {
+    await browser.takeScreenshot()
+  }
+}
+
 export const config: WebdriverIO.Config = {
   runner: 'local',
   tsConfigPath: './tsconfig.json',
@@ -26,14 +36,19 @@ export const config: WebdriverIO.Config = {
         args: [
           ...adBlockArgs,
           ...(process.env.CI
-            ? ['--headless=new', '--no-sandbox', '--disable-dev-shm-usage', '--window-size=1920,1080']
+            ? [
+                '--headless=new',
+                '--no-sandbox',
+                '--disable-dev-shm-usage',
+                '--window-size=1920,1080',
+              ]
             : []),
         ],
       },
     },
   ],
 
-  logLevel: 'info',
+  logLevel: process.env.CI ? 'warn' : 'info',
   bail: 0,
   baseUrl: process.env.BASE_URL,
   waitforTimeout: 10000,
@@ -68,9 +83,6 @@ export const config: WebdriverIO.Config = {
     )
   },
 
-    afterTest: async function (_test, _context, { passed }) {
-    if (!passed) {
-      await browser.takeScreenshot()
-    }
-  },
+  afterTest: screenshotOnFailure,
+  afterHook: screenshotOnFailure,
 }

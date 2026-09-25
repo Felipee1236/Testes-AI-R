@@ -149,3 +149,4 @@ Os testes são implementados em Mocha, conforme a stack recomendada. Para comuni
 ```gherkin
 Funcionalidade: Autenticação
 
+```

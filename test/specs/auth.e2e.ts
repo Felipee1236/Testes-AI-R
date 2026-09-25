@@ -10,6 +10,7 @@ interface InvalidLogin {
   usarEmailCadastrado?: boolean
   email?: string
   password: string
+  mensagemEsperada: string
 }
 
 const invalidLogins = loadTestData<InvalidLogin[]>('invalid-logins.json')
@@ -44,12 +45,12 @@ describe('Autenticação', () => {
 
   for (const caso of invalidLogins) {
     it(`deve exibir erro ao fazer login com ${caso.cenario}`, async () => {
-      const email = caso.usarEmailCadastrado ? user.email : (caso.email as string)
+      const email = caso.usarEmailCadastrado ? user.email : (caso.email ?? '')
 
       await LoginPage.open()
       await LoginPage.login(email, caso.password)
 
-      await expect(LoginPage.loginErrorMessage).toHaveText('Your email or password is incorrect!')
+      await expect(LoginPage.loginErrorMessage).toHaveText(caso.mensagemEsperada)
       await expect(HomePage.linkLogout).not.toBeExisting()
     })
   }

@@ -2,11 +2,13 @@
   {
     "cenario": "senha incorreta",
     "usarEmailCadastrado": true,
-    "password": "SenhaErrada@123"
+    "password": "SenhaErrada@123",
+    "mensagemEsperada": "Your email or password is incorrect!"
   },
   {
     "cenario": "e-mail não cadastrado",
     "email": "nao.cadastrado.qa@teste.com",
-    "password": "Senha@123"
+    "password": "Senha@123",
+    "mensagemEsperada": "Your email or password is incorrect!"
   }
 ]

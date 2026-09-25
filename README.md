@@ -8,16 +8,16 @@ Projeto de automação E2E do site [Automation Exercise](https://automationexerc
 
 ## Stack
 
-| Ferramenta | Uso |
-| --- | --- |
-| [WebdriverIO](https://webdriver.io) | Framework de automação |
-| TypeScript | Linguagem |
-| Mocha | Test runner |
-| Allure Report | Relatório interativo |
-| GitHub Actions | Integração contínua |
-| LambdaTest (atual TestMu AI) | Execução em nuvem |
-| ESLint + Prettier | Qualidade e padronização do código |
-| dotenv | Variáveis de ambiente |
+| Ferramenta                          | Uso                                |
+| ----------------------------------- | ---------------------------------- |
+| [WebdriverIO](https://webdriver.io) | Framework de automação             |
+| TypeScript                          | Linguagem                          |
+| Mocha                               | Test runner                        |
+| Allure Report                       | Relatório interativo               |
+| GitHub Actions                      | Integração contínua                |
+| LambdaTest (atual TestMu AI)        | Execução em nuvem                  |
+| ESLint + Prettier                   | Qualidade e padronização do código |
+| dotenv                              | Variáveis de ambiente              |
 
 ## Pré-requisitos
 
@@ -123,18 +123,18 @@ wdio.lambdatest.conf.ts   # configuração da nuvem (herda a local)
 
 Os 10 cenários foram priorizados por risco e impacto nas jornadas principais, cobrindo os quatro grupos pedidos: autenticação, formulários, navegação e validação de erros.
 
-| # | Cenário | Grupo | Tipo | Status |
-| --- | --- | --- | --- | --- |
-| 1 | Login com credenciais válidas | Autenticação | Sucesso | Implementado |
-| 2 | Logout encerra a sessão | Autenticação | Sucesso | Implementado |
-| 3 | Login com credenciais inválidas (data-driven) | Autenticação | Falha | Implementado |
-| 4 | Cadastro completo de conta | Formulários | Sucesso | Implementado |
-| 5 | Envio do formulário de contato | Formulários | Sucesso | Implementado |
-| 6 | Cadastro com campo obrigatório vazio | Formulários | Falha | Implementado |
-| 7 | Navegação por categoria de produtos | Navegação | Sucesso | Implementado |
-| 8 | Detalhes de produto a partir da listagem | Navegação | Sucesso | Implementado |
-| 9 | Cadastro com e-mail já existente | Validação | Falha | Implementado |
-| 10 | Checkout sem login exige autenticação | Validação | Falha | Implementado |
+| #   | Cenário                                       | Grupo        | Tipo    | Status       |
+| --- | --------------------------------------------- | ------------ | ------- | ------------ |
+| 1   | Login com credenciais válidas                 | Autenticação | Sucesso | Implementado |
+| 2   | Logout encerra a sessão                       | Autenticação | Sucesso | Implementado |
+| 3   | Login com credenciais inválidas (data-driven) | Autenticação | Falha   | Implementado |
+| 4   | Cadastro completo de conta                    | Formulários  | Sucesso | Implementado |
+| 5   | Envio do formulário de contato                | Formulários  | Sucesso | Implementado |
+| 6   | Cadastro com campo obrigatório vazio          | Formulários  | Falha   | Implementado |
+| 7   | Navegação por categoria de produtos           | Navegação    | Sucesso | Implementado |
+| 8   | Detalhes de produto a partir da listagem      | Navegação    | Sucesso | Implementado |
+| 9   | Cadastro com e-mail já existente              | Validação    | Falha   | Implementado |
+| 10  | Checkout sem login exige autenticação         | Validação    | Falha   | Implementado |
 
 Os 10 cenários geram 11 testes no relatório: o cenário 3 é data-driven e roda uma vez para cada caso do arquivo JSON (hoje, 2 casos).
 
@@ -187,11 +187,11 @@ Funcionalidade: Carrinho
 
 O relatório Allure reúne:
 
-| Requisito | Como é atendido |
-| --- | --- |
-| Status de execução | Pass, fail e skipped por teste e por suíte |
-| Logs de execução | Cada comando do WebdriverIO aparece como um passo do teste |
-| Screenshot na falha | O hook `afterTest` captura a tela quando um teste falha, e o Allure anexa a imagem ao teste |
+| Requisito             | Como é atendido                                                                                                                              |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Status de execução    | Pass, fail e skipped por teste e por suíte                                                                                                   |
+| Logs de execução      | Cada comando do WebdriverIO aparece como um passo do teste                                                                                   |
+| Screenshot na falha   | O hook `afterTest` captura a tela quando um teste falha, e o Allure anexa a imagem ao teste                                                  |
 | Metadados do ambiente | O hook `before` grava `environment.properties` com navegador, versão, plataforma, sistema operacional, Node e URL base, lidos da sessão real |
 
 Os resultados anteriores são apagados no início de cada execução (hook `onPrepare`), para que o relatório nunca misture execuções diferentes.

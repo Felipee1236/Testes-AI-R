@@ -25,6 +25,15 @@ describe('Cadastro', () => {
     await LoginPage.open()
     await LoginPage.startSignup(user.name, user.email)
     await SignupPage.fillAccountInfo(user)
+
+    await expect(SignupPage.radioMr).toBeSelected()
+    await expect(SignupPage.checkboxNewsletter).toBeSelected()
+    await expect(SignupPage.checkboxOffers).toBeSelected()
+    await expect(SignupPage.selectDay).toHaveValue(user.birthDay)
+    await expect(SignupPage.selectedMonth).toHaveText(user.birthMonth)
+    await expect(SignupPage.selectYear).toHaveValue(user.birthYear)
+    await expect(SignupPage.selectedCountry).toHaveText(user.country)
+
     await SignupPage.submit()
     createdUser = user
 
